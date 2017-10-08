@@ -1,64 +1,65 @@
-#!/bin/bash
+#bash!/bin/bash
 
+#install Flask, Gunicorn and NginX on Ubuntu 14 LTS
 #insall and start flask
 
+set WEBSERVERIP = $(curl checkip.amazonaws.com)
 
 sudo apt-get -y update
 sudo apt-get -y install python
 sudo apt-get -y install python-pip
 sudo apt-get -y install python2.7-dev
 sudo apt-get -y install nginx
-sudo apt-get -y install git
+sudo apt-get -y install git-core
 sudo apt-get -y install crudini
+sudo apt-get -y install python-virtualenv
+sudo pip install --upgrade pip
 
 
-pip install --upgrade pip
-pip install virtualenv  
+git clone https://github.com/servicenowcmf/FlaskGNMongoApp.git
+sleep 15s
+echo "git clone complete"
+sudo sed -i '5 aplace' ~/FlaskGNMongoApp/test.py
+sudo sed -i 's|place|client = pymongo.MongoClient("mongodb://54.234.88.8")|' ~/FlaskGNMongoApp/test.py 
+sudo sed -i '7d' ~/FlaskGNMongoApp/test.py 
+
+cd FlaskGNMongoApp
+virtualenv test
+source test/bin/activate
 pip install flask
 pip install bson
 pip install gunicorn
 pip install pymongo
+deactivate 
 
 
-sudo git clone https://github.com/CoolBoi567/To-Do-List---Flask-MongoDB-Example.git /
-sudo mv To-Do-List---Flask-MongoDB-Example pythonmongoapp1
-sudo cd /pythonmongoapp1
+cd /etc/nginx/sites-available
+sudo touch test.conf
+sudo chmod 777 test.conf
+sudo printf "%s\n" 'server {' >> test.conf
+sudo printf "\t%s\n" 'listen 80;' >> test.conf
+sudo printf "\t server_name %s;\n" $WEBSERVERIP >> test.conf   #Relace <IP ADDRESS>
+sudo printf "\t%s\n" 'root /home/ubuntu/FlaskGNMongoApp;' >> test.conf
+sudo printf "\t%s\n" 'access_log /home/ubuntu/FlaskGNMongoApp/access.log;' >> test.conf
+sudo printf "\t%s\n" 'error_log /home/ubuntu/FlaskGNMongoApp/error.log;' >> test.conf
+sudo printf "\n" >> test.conf
+sudo printf "\t%s\n" 'location / {' >> test.conf
+sudo printf "\t\t%s\n" 'proxy_set_header X-Forward-For $proxy_add_x_forwarded_for;' >> test.conf
+sudo printf "\t\t%s\n" 'proxy_set_header Host $http_host;' >> test.conf
+sudo printf "\t\t%s\n" 'proxy_redirect off;' >> test.conf
+sudo printf "\t\t%s\n" 'if (!-f $request_filename) {' >> test.conf
+sudo printf "\t\t\t%s\n" 'proxy_pass http://127.0.0.1:8000;' >> test.conf
+sudo printf "\t\t\t%s\n" 'break;' >> test.conf
+sudo printf "\t\t%s\n" '}' >> test.conf
+sudo printf "\t%s\n" '}' >> test.conf
+sudo printf "}" >> test.conf
+sudo chmod 644 test.conf
 
-  # add mongo db connection url
-virtualenv pythonmongoapp1env
-source pythonmongoapp1env/bin/activate
-deactivate
-
-sudo cd /etc/init/
-sudo touch pythonmongoapp1.conf
-sudo printf "%s\n" 'description "Gunicorn application server running pythonmongoapp1"' >> pythonmongoapp1.conf
-sudo printf "%s\n" 'start on runlevel [2345]' >> pythonmongoapp1.conf
-sudo printf "%s\n" 'stop on runlevel [!2345]' >> pythonmongoapp1.conf
-sudo printf "%s\n" 'respawn' >> pythonmongoapp1.conf
-sudo printf "%s\n" 'setuid user' >> pythonmongoapp1.conf
-sudo printf "%s\n" 'setgid www-data' >> pythonmongoapp1.conf
-sudo printf "%s\n" 'env PATH=/home/user/pythonmongoapp1/pythonmongoapp1env/bin' >> pythonmongoapp1.conf
-sudo printf "%s\n" 'cd /home/user/pythonmongoapp1' >> pythonmongoapp1.conf
-sudo printf "%s\n" 'exec gunicorn --workers 3 --bind unix:pythonmongoapp1.sock -m 007 wsgi' >> pythonmongoapp1.conf
-
-sudo start pythonmongoapp1
-
-sudo cd /etc/nginx/sites-available
-sudo touch pythonmongoapp1
-sudo printf "%s\n" 'server {' >> pythonmongoapp1
-sudo printf "\t%s\n" 'listen 80;' >> pythonmongoapp1
-sudo printf "\t%s\n" 'server_name <IP ADDRESS>;' >> pythonmongoapp1   #Relace <IP ADDRESS>
-sudo printf "\n" >> pythonmongoapp1
-sudo printf "\t%s\n" 'location / {' >> pythonmongoapp1
-sudo printf "\t\t%s\n" 'http://unix:pythonmongoapp1.sock;' >> pythonmongoapp1
-sudo printf "%s\n" '}' >> pythonmongoapp1
-sudo printf "}" >> pythonmongoapp1
-
-sudo ln -s /etc/nginx/sites-available/pythonmongoapp1 /etc/nginx/sites-enabled
+sudo ln -s /etc/nginx/sites-available/test.conf /etc/nginx/sites-enabled
 
 sudo nginx -t
 
-sudo service nginx restart
+sudo service nginx reload
 
 
 
