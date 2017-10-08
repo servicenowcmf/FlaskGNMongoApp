@@ -43,7 +43,7 @@ sudo touch test.conf
 sudo chmod 777 test.conf
 sudo printf "%s\n" 'server {' >> test.conf
 sudo printf "\t%s\n" 'listen 80;' >> test.conf
-sudo printf "\t server_name %s;\n" $WEBSERVERIP >> test.conf   #Relace <IP ADDRESS>
+sudo printf "\t server_name %s;\n" $(curl checkip.amazonaws.com) >> test.conf   #Relace <IP ADDRESS>
 sudo printf "\t%s\n" 'root /home/ubuntu/FlaskGNMongoApp/test;' >> test.conf
 sudo printf "\t%s\n" 'access_log /home/ubuntu/FlaskGNMongoApp/test/access.log;' >> test.conf
 sudo printf "\t%s\n" 'error_log /home/ubuntu/FlaskGNMongoApp/test/error.log;' >> test.conf
