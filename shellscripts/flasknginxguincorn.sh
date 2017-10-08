@@ -3,7 +3,8 @@
 #install Flask, Gunicorn and NginX on Ubuntu 14 LTS
 #insall and start flask
 
-set WEBSERVERIP = $(curl checkip.amazonaws.com)
+IP=$(curl -s 'http://checkip.amazonaws.com')
+echo "$IP"
 
 sudo apt-get -y update
 sudo apt-get -y install python
@@ -20,22 +21,27 @@ sudo pip install --upgrade pip
 git clone https://github.com/servicenowcmf/FlaskGNMongoApp.git
 sleep 15s
 echo "git clone complete"
-sudo sed -i '4 aplace' ~/FlaskGNMongoApp/test.py
-sudo sed -i 's|place|client = pymongo.MongoClient("mongodb://54.234.88.8")|' ~/FlaskGNMongoApp/test.py 
-sudo sed -i '5d' ~/FlaskGNMongoApp/test.py 
+
 
 cd FlaskGNMongoApp
 virtualenv test
+cd test
 source test/bin/activate
-pip install flask
-pip install bson
-pip install gunicorn
-pip install pymongo
-mv static test
-mv templates test
-mv test.py test
-mv wsgi.py test
+sudo pip install flask
+sudo pip install bson
+sudo pip install gunicorn
+sudo pip install pymongo
+cd ..
+sudo mv static test
+sudo mv templates test
+sudo mv test.py test
+sudo mv wsgi.py test
 deactivate 
+
+cd test
+sudo sed -i '4 aplace' test.py
+sudo sed -i 's|place|client = pymongo.MongoClient("mongodb://54.234.88.8")|' test.py 
+sudo sed -i '6d' test.py 
 
 
 cd /etc/nginx/sites-available
@@ -43,7 +49,7 @@ sudo touch test.conf
 sudo chmod 777 test.conf
 sudo printf "%s\n" 'server {' >> test.conf
 sudo printf "\t%s\n" 'listen 80;' >> test.conf
-sudo printf "\t server_name %s;\n" $(curl checkip.amazonaws.com) >> test.conf   #Relace <IP ADDRESS>
+sudo printf "\t server_name $IP;\n"  >> test.conf   #Relace <IP ADDRESS>
 sudo printf "\t%s\n" 'root /home/ubuntu/FlaskGNMongoApp/test;' >> test.conf
 sudo printf "\t%s\n" 'access_log /home/ubuntu/FlaskGNMongoApp/test/access.log;' >> test.conf
 sudo printf "\t%s\n" 'error_log /home/ubuntu/FlaskGNMongoApp/test/error.log;' >> test.conf
@@ -59,7 +65,6 @@ sudo printf "\t\t%s\n" '}' >> test.conf
 sudo printf "\t%s\n" '}' >> test.conf
 sudo printf "}" >> test.conf
 sudo chmod 644 test.conf
-
 
 
 sudo ln -s /etc/nginx/sites-available/test.conf /etc/nginx/sites-enabled
