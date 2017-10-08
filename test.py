@@ -1,6 +1,7 @@
 from flask import Flask, render_template,request,redirect,url_for # For flask implementation
 from pymongo import MongoClient # Database connector
 from bson.objectid import ObjectId # For ObjectId to work
+from werkzeug.contrib.fixers import ProxyFix
 
 client = MongoClient('localhost', 27017)    #Configure the connection to the database
 db = client.camp2016    #Select the database
@@ -108,6 +109,8 @@ def search():
 @app.route("/about")
 def about():
 	return render_template('credits.html',t=title,h=heading)
+
+app.wsgi_app = ProxyFix(app.wsgi_app)
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0')
