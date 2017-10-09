@@ -21,20 +21,19 @@ sudo apt-get -y install python-virtualenv
 sudo pip install --upgrade pip
 
 
+
 git clone https://github.com/servicenowcmf/FlaskGNMongoApp.git
 sleep 5s
 echo "git clone complete"
 
 
 cd FlaskGNMongoApp
-virtualenv test
-cd test
+sudo virtualenv test
 source test/bin/activate
 sudo pip install flask
 sudo pip install bson
-sudo pip install gunicorn
 sudo pip install pymongo
-cd ..
+sudo pip install gunicorn
 sudo mv static test
 sudo mv templates test
 sudo mv test.py test

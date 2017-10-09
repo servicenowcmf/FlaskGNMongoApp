@@ -18,7 +18,13 @@ echo "$IP"
 
 
 sudo apt-get -y update
-sudo apt-get install -y python python-pip python-virtualenv nginx gunicorn
+sudo apt-get install -y python 
+sudo apt-get install -y python-pip 
+sudo apt-get install -y python-virtualenv
+sudo apt-get install -y nginx 
+sudo apt-get install -y gunicorn
+sudo apt-get -y install git-core
+sudo apt-get -y install build-essential python-dev
 
 
 git clone https://github.com/servicenowcmf/FlaskGNMongoApp.git
@@ -31,6 +37,9 @@ sudo virtualenv env
 source env/bin/activate
 sudo pip install Flask==0.10.1
 sudo pip install pymongo
+sudo pip install bson
+
+
 sudo mkdir flask_project && cd flask_project
 
 sudo mv /home/ubuntu/FlaskGNMongoApp/static /home/www/flask_project
