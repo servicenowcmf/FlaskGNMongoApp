@@ -4,7 +4,10 @@
 #insall and start flask
 
 IP=$(curl -s 'http://checkip.amazonaws.com')
+sleep 5s
+echo "Discovered IP"
 echo "$IP"
+
 
 sudo apt-get -y update
 sudo apt-get -y install python
@@ -19,7 +22,7 @@ sudo pip install --upgrade pip
 
 
 git clone https://github.com/servicenowcmf/FlaskGNMongoApp.git
-sleep 15s
+sleep 5s
 echo "git clone complete"
 
 
@@ -49,7 +52,7 @@ sudo touch test.conf
 sudo chmod 777 test.conf
 sudo printf "%s\n" 'server {' >> test.conf
 sudo printf "\t%s\n" 'listen 80;' >> test.conf
-sudo printf "\t server_name $IP;\n"  >> test.conf   #Relace <IP ADDRESS>
+sudo echo -e '\t'"server_name  $IP;"  >> test.conf   #Relace <IP ADDRESS>
 sudo printf "\t%s\n" 'root /home/ubuntu/FlaskGNMongoApp/test;' >> test.conf
 sudo printf "\t%s\n" 'access_log /home/ubuntu/FlaskGNMongoApp/test/access.log;' >> test.conf
 sudo printf "\t%s\n" 'error_log /home/ubuntu/FlaskGNMongoApp/test/error.log;' >> test.conf
